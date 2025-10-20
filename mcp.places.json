@@ -1,0 +1,2 @@
+
+{ "name": "LocationsAgent", "command": "python", "args": ["-m", "trip_research_agent.mcp_servers.locations_server"], "env": {}, "version": "0.1.0" }

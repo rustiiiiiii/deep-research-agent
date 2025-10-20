@@ -1,0 +1,40 @@
+# OS / Editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python cache & build artefacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual environments & local tooling
+.venv/
+venv/
+env/
+deep-research-agent/
+.env
+
+# Logs & runtime dumps
+*.log
+*.tmp
+
+# Dependency / environment files generated at runtime
+pip-wheel-metadata/
+
+# Coverage & testing artefacts
+.coverage
+coverage.xml
+htmlcov/
+.pytest_cache/
+
+# IDE metadata
+*.code-workspace
