@@ -9,7 +9,7 @@ you can extend as you build more sophisticated planning capabilities.
 ## Features
 
 - Uses [Microsoft AutoGen](https://microsoft.github.io/autogen/) to orchestrate language models and tools.
-- Wraps the Tavily search API to fetch up‑to‑date travel information.
+- Connects to a Tavily MCP server over HTTP JSON-RPC to fetch up‑to‑date travel information.
 - Illustrates how to build a custom AutoGen assistant that can call multiple tools (search plus in‑house domain stubs).
 - Designed for interactive use via the command line or integration into a chat interface.
 
@@ -18,7 +18,7 @@ you can extend as you build more sophisticated planning capabilities.
 ### Prerequisites
 
 - Python 3.8 or higher.
-- API keys for your chosen language model (e.g. OpenAI) and search provider (e.g. SerpAPI, Google).
+- API keys for your chosen language model (e.g. OpenAI GPT-5 Nano via `OPENAI_API_KEY`) and credentials for the Tavily MCP server (set `TAVILY_MCP_BASE_URL` to the JSON-RPC endpoint, e.g. `https://mcp.tavily.com/mcp`, and optionally `TAVILY_MCP_API_KEY`).
 - Optional: VS Code with the Python extension for a smoother development experience.
 
 ### Installation
@@ -47,14 +47,27 @@ you can extend as you build more sophisticated planning capabilities.
 ### Running the Agent
 
 The package exposes a simple CLI entry point.  Once your environment
-variables are set you can run:
+variables are set and the Tavily MCP JSON-RPC endpoint is reachable you can run:
 
 ```bash
 python main.py
 ```
 
 You’ll be prompted for a travel‑related question.  The agent will
-perform a web search and return a concise answer.
+perform a web search through the Tavily MCP tool and return a concise answer.
+
+#### Local MCP server
+
+If you do not have access to a hosted MCP endpoint you can run the bundled
+Tavily MCP shim locally:
+
+```bash
+TAVILY_API_KEY=your_key python -m mcp_servers.local_tavily_server
+```
+
+By default it listens on `http://127.0.0.1:6112/mcp`.  Point
+`TAVILY_MCP_BASE_URL` at that URL (this is already the default in `.env`) and
+the agent will route all `web_search` tool calls through the local server.
 
 ### Project Structure
 

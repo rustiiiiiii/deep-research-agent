@@ -38,3 +38,6 @@ htmlcov/
 
 # IDE metadata
 *.code-workspace
+
+# Additional files/folders
+responses/
