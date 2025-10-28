@@ -153,8 +153,8 @@ class ResearchAgent:
             model_client=self._model_client,
             system_message=planner_system_message,
             description="Plans searches by emitting query suggestions only.",
-            tools=[],
-            max_tool_iterations=1,
+            tools=[self._group_search_tool],
+            max_tool_iterations=self._max_tool_iterations,
         )
 
         writer_system_message = (
@@ -423,7 +423,24 @@ class ResearchAgent:
 
     def _extract_text(self, messages: Iterable[Any], preferred_source: Optional[str]) -> str:
         final_message = self._last_chat_message(messages, preferred_source=preferred_source)
-@@ -236,50 +394,62 @@ class ResearchAgent:
+        text_method = getattr(final_message, "to_text", None)
+        if callable(text_method):
+            try:
+                return text_method()
+            except Exception:  # pragma: no cover - defensive fallback
+                logger.debug("Failed to extract text via to_text().", exc_info=True)
+        content = getattr(final_message, "content", None)
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            return "\n".join(str(item) for item in content)
+        return str(final_message)
+
+    def _parse_queries(self, text: str) -> List[str]:
+        text = (text or "").strip()
+        if not text:
+            return []
+        try:
             data = json.loads(text)
             if isinstance(data, list):
                 return [str(item).strip() for item in data if str(item).strip()]
@@ -492,3 +509,6 @@ class ResearchAgent:
             "include_name_in_message": False,
             "model_info": model_info,
         }
+        if temperature is not None:
+            client_kwargs["temperature"] = temperature
+        return OpenAIChatCompletionClient(**client_kwargs)
