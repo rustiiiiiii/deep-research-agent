@@ -1,0 +1,474 @@
+{
+  "timestamp": "20251029_132722",
+  "question": "age of rishab pant",
+  "steps": [
+    {
+      "agent": "question_breakdown",
+      "timestamp": "2025-10-29T13:27:31Z",
+      "context": {
+        "system_message": "You analyze the user's research request and break it into 4-5 concise, targeted sub-questions. Each sub-question should be specific enough to research independently while collectively addressing the original request. Respond ONLY with a JSON array of strings.",
+        "prompt": "Break the user's request into 4-5 concise research questions that collectively cover the topic.\n\nUser request: age of rishab pant\nReturn only a JSON array of strings.",
+        "raw_output": "[\n  \"What is Rishabh Pant's date of birth and place of birth?\",\n  \"How old is Rishabh Pant as of today?\",\n  \"At what ages did Pant debut in Tests, ODIs, and T20Is, and what major milestones did he achieve at those ages?\",\n  \"How does Pant's age compare with other Indian cricketers in similar roles or generations at comparable career stages?\",\n  \"What sources reliably provide Pant's birth date and current age, and are there any discrepancies among major databases?\"\n]",
+        "parsed_questions": [
+          "What is Rishabh Pant's date of birth and place of birth?",
+          "How old is Rishabh Pant as of today?",
+          "At what ages did Pant debut in Tests, ODIs, and T20Is, and what major milestones did he achieve at those ages?",
+          "How does Pant's age compare with other Indian cricketers in similar roles or generations at comparable career stages?",
+          "What sources reliably provide Pant's birth date and current age, and are there any discrepancies among major databases?"
+        ]
+      }
+    },
+    {
+      "agent": "search_query_generator",
+      "timestamp": "2025-10-29T13:27:51Z",
+      "context": {
+        "system_message": "You craft focused web search queries. Given a user question, list 3-4 short, precise search queries that will retrieve trustworthy, fresh information. Respond ONLY with a JSON array of strings.",
+        "prompt": "Generate search queries for the following user question.\n\nQuestion: age of rishab pant\n\nFocus on addressing these sub-questions:\n- What is Rishabh Pant's date of birth and place of birth?\n- How old is Rishabh Pant as of today?\n- At what ages did Pant debut in Tests, ODIs, and T20Is, and what major milestones did he achieve at those ages?\n- How does Pant's age compare with other Indian cricketers in similar roles or generations at comparable career stages?\n- What sources reliably provide Pant's birth date and current age, and are there any discrepancies among major databases?\n\nReturn only a JSON array of strings.",
+        "raw_output": "[\n  \"Rishabh Pant date of birth and place of birth site:espncricinfo.com\",\n  \"Rishabh Pant age today 2025\",\n  \"Rishabh Pant debut age Tests ODIs T20Is site:espncricinfo.com\",\n  \"Rishabh Pant birth date discrepancies espncricinfo wikipedia cricbuzz\"\n]",
+        "parsed_queries": [
+          "Rishabh Pant date of birth and place of birth site:espncricinfo.com",
+          "Rishabh Pant age today 2025",
+          "Rishabh Pant debut age Tests ODIs T20Is site:espncricinfo.com",
+          "Rishabh Pant birth date discrepancies espncricinfo wikipedia cricbuzz"
+        ]
+      }
+    },
+    {
+      "agent": "tavily.search",
+      "timestamp": "2025-10-29T13:27:54Z",
+      "context": {
+        "query": "Rishabh Pant date of birth and place of birth site:espncricinfo.com",
+        "payload": {
+          "query": "Rishabh Pant date of birth and place of birth site:espncricinfo.com",
+          "max_results": 5,
+          "include_raw_content": false
+        },
+        "raw_response": {
+          "query": "Rishabh Pant date of birth and place of birth",
+          "follow_up_questions": null,
+          "answer": null,
+          "images": [],
+          "results": [
+            {
+              "url": "https://www.espncricinfo.com/cricketers/rishabh-pant-931581",
+              "title": "Rishabh Pant Profile - Cricket Player India | Stats, Records ...",
+              "content": "Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper.",
+              "score": 0.7318455,
+              "raw_content": null
+            },
+            {
+              "url": "https://stats.espncricinfo.com/ci/engine/player/931581.html?class=2;type=allround",
+              "title": "Cricinfo Statsguru",
+              "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024).",
+              "score": 0.69573146,
+              "raw_content": null
+            },
+            {
+              "url": "https://stats.espncricinfo.com/ci/engine/player/931581.html?class=11;type=allround",
+              "title": "Combined Test, ODI and T20I records | Cricinfo Statsguru",
+              "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024).",
+              "score": 0.68140936,
+              "raw_content": null
+            },
+            {
+              "url": "https://stats.espncricinfo.com/ci/engine/player/931581.html?class=1;type=allround",
+              "title": "All-round records | Test matches | Cricinfo Statsguru",
+              "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024).",
+              "score": 0.6737291,
+              "raw_content": null
+            },
+            {
+              "url": "https://stats.espncricinfo.com/ci/engine/player/931581.html?class=6;filter=advanced;filter_box=dismissal;type=allround",
+              "title": "All-round records | Twenty20 matches | Cricinfo Statsguru",
+              "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All",
+              "score": 0.66308063,
+              "raw_content": null
+            }
+          ],
+          "response_time": 1.38,
+          "request_id": "85282e8a-227c-4d0a-82d6-e0e53a83d915"
+        },
+        "simplified_results": [
+          {
+            "title": "Rishabh Pant Profile - Cricket Player India | Stats, Records ...",
+            "content": "Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper."
+          },
+          {
+            "title": "Cricinfo Statsguru",
+            "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024)."
+          },
+          {
+            "title": "Combined Test, ODI and T20I records | Cricinfo Statsguru",
+            "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024)."
+          },
+          {
+            "title": "All-round records | Test matches | Cricinfo Statsguru",
+            "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024)."
+          },
+          {
+            "title": "All-round records | Twenty20 matches | Cricinfo Statsguru",
+            "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All"
+          }
+        ]
+      }
+    },
+    {
+      "agent": "tavily.search",
+      "timestamp": "2025-10-29T13:27:56Z",
+      "context": {
+        "query": "Rishabh Pant age today 2025",
+        "payload": {
+          "query": "Rishabh Pant age today 2025",
+          "max_results": 5,
+          "include_raw_content": false
+        },
+        "raw_response": {
+          "query": "Rishabh Pant age today 2025",
+          "follow_up_questions": null,
+          "answer": null,
+          "images": [],
+          "results": [
+            {
+              "url": "https://www.mykhel.com/cricket/players/rishabh-pant-p8229/",
+              "title": "Rishabh Pant Profile: Age, Stats, Records, ICC Ranking, Career Info ...",
+              "content": "Rishabh Pant was born on Oct 04, 1997; and as of 2025, He is 28 years old. Rishabh Pant is a wicket keeper from Haridwar, Uttarakhand and bats left handed. In",
+              "score": 0.92700076,
+              "raw_content": null
+            },
+            {
+              "url": "https://www.moneycontrol.com/sports/cricket/player-profile-rishabh-pant-65756.html",
+              "title": "Rishabh Pant ICC Ranking | Cricket Career, Cricket Info & Stats",
+              "content": "Rishabh Pant ; Born, October 4, 1997 ; Current age, 28 Years, 0 Months, 24 Days ; Major team, India, Asia XI, India A, India B, Indian Board Presidents XI, India",
+              "score": 0.6641271,
+              "raw_content": null
+            },
+            {
+              "url": "https://league11.in/cricket/rishabh-pant/",
+              "title": "Check Rishabh Pant IPL 2025 Team, Profile, Stats & Age - League11",
+              "content": "Rishabh Pant - Wicketkeeper Batsman Indian - Overview Stats Overview - Born: Oct. 4, 1997 - Height: 5.58 Feet - Batting Style: Left hand Bat - Bowling Style: NA",
+              "score": 0.64236575,
+              "raw_content": null
+            },
+            {
+              "url": "https://en.wikipedia.org/wiki/Rishabh_Pant",
+              "title": "Rishabh Pant - Wikipedia",
+              "content": "Personal information ; Full name. Rishabh Rajendra Pant ; Born, (1997-10-04) 4 October 1997 (age 28) Roorkee, Uttar Pradesh (present day Uttarakhand), India.",
+              "score": 0.60917604,
+              "raw_content": null
+            },
+            {
+              "url": "https://www.espncricinfo.com/cricketers/rishabh-pant-931581",
+              "title": "Rishabh Pant Profile - Cricket Player India | Stats, Records, Video",
+              "content": "Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper.",
+              "score": 0.5925965,
+              "raw_content": null
+            }
+          ],
+          "response_time": 1.18,
+          "request_id": "a7cf4ea0-4a6a-482a-ba97-7d8f4d459403"
+        },
+        "simplified_results": [
+          {
+            "title": "Rishabh Pant Profile: Age, Stats, Records, ICC Ranking, Career Info ...",
+            "content": "Rishabh Pant was born on Oct 04, 1997; and as of 2025, He is 28 years old. Rishabh Pant is a wicket keeper from Haridwar, Uttarakhand and bats left handed. In"
+          },
+          {
+            "title": "Rishabh Pant ICC Ranking | Cricket Career, Cricket Info & Stats",
+            "content": "Rishabh Pant ; Born, October 4, 1997 ; Current age, 28 Years, 0 Months, 24 Days ; Major team, India, Asia XI, India A, India B, Indian Board Presidents XI, India"
+          },
+          {
+            "title": "Check Rishabh Pant IPL 2025 Team, Profile, Stats & Age - League11",
+            "content": "Rishabh Pant - Wicketkeeper Batsman Indian - Overview Stats Overview - Born: Oct. 4, 1997 - Height: 5.58 Feet - Batting Style: Left hand Bat - Bowling Style: NA"
+          },
+          {
+            "title": "Rishabh Pant - Wikipedia",
+            "content": "Personal information ; Full name. Rishabh Rajendra Pant ; Born, (1997-10-04) 4 October 1997 (age 28) Roorkee, Uttar Pradesh (present day Uttarakhand), India."
+          },
+          {
+            "title": "Rishabh Pant Profile - Cricket Player India | Stats, Records, Video",
+            "content": "Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper."
+          }
+        ]
+      }
+    },
+    {
+      "agent": "tavily.search",
+      "timestamp": "2025-10-29T13:27:58Z",
+      "context": {
+        "query": "Rishabh Pant debut age Tests ODIs T20Is site:espncricinfo.com",
+        "payload": {
+          "query": "Rishabh Pant debut age Tests ODIs T20Is site:espncricinfo.com",
+          "max_results": 5,
+          "include_raw_content": false
+        },
+        "raw_response": {
+          "query": "Rishabh Pant debut age Tests ODIs T20Is",
+          "follow_up_questions": null,
+          "answer": null,
+          "images": [],
+          "results": [
+            {
+              "url": "https://www.espncricinfo.com/cricketers/rishabh-pant-931581",
+              "title": "Rishabh Pant Profile - Cricket Player India | Stats, Records ...",
+              "content": "Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper.",
+              "score": 0.5372119,
+              "raw_content": null
+            },
+            {
+              "url": "https://stats.espncricinfo.com/ci/engine/player/931581.html?class=21;filter=advanced;filter_box=dismissal;filter_box=host;filter_box=opposition;filter_box=series;type=allround",
+              "title": "All-round records | Under-19s Youth One-Day Internationals",
+              "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All",
+              "score": 0.53123426,
+              "raw_content": null
+            },
+            {
+              "url": "https://stats.espncricinfo.com/ci/engine/player/931581.html?class=11;filter=advanced;filter_box=final_type;filter_box=host;filter_box=opposition;type=allround",
+              "title": "Combined Test, ODI and T20I records | Cricinfo Statsguru",
+              "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All",
+              "score": 0.53094244,
+              "raw_content": null
+            },
+            {
+              "url": "https://stats.espncricinfo.com/ci/engine/player/931581.html?class=6;filter=advanced;filter_box=dismissal;type=allround",
+              "title": "All-round records | Twenty20 matches | Cricinfo Statsguru",
+              "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All",
+              "score": 0.5037359,
+              "raw_content": null
+            },
+            {
+              "url": "https://www.espncricinfo.com/cricketers/rishabh-pant-931581/matches",
+              "title": "Rishabh Pant Debut and last played matches in Tests ...",
+              "content": "Rishabh Pant ; Test Matches. View Test Records · England vs India at Nottingham- August 18 - 22, 2018 · England vs India at Manchester- July 23 - 27, 2025 ; ODI",
+              "score": 0.451448,
+              "raw_content": null
+            }
+          ],
+          "response_time": 0.94,
+          "request_id": "2a29c342-a60e-41d5-911c-0cd5394903d0"
+        },
+        "simplified_results": [
+          {
+            "title": "Rishabh Pant Profile - Cricket Player India | Stats, Records ...",
+            "content": "Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper."
+          },
+          {
+            "title": "All-round records | Under-19s Youth One-Day Internationals",
+            "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All"
+          },
+          {
+            "title": "Combined Test, ODI and T20I records | Cricinfo Statsguru",
+            "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All"
+          },
+          {
+            "title": "All-round records | Twenty20 matches | Cricinfo Statsguru",
+            "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All"
+          },
+          {
+            "title": "Rishabh Pant Debut and last played matches in Tests ...",
+            "content": "Rishabh Pant ; Test Matches. View Test Records · England vs India at Nottingham- August 18 - 22, 2018 · England vs India at Manchester- July 23 - 27, 2025 ; ODI"
+          }
+        ]
+      }
+    },
+    {
+      "agent": "tavily.search",
+      "timestamp": "2025-10-29T13:28:00Z",
+      "context": {
+        "query": "Rishabh Pant birth date discrepancies espncricinfo wikipedia cricbuzz",
+        "payload": {
+          "query": "Rishabh Pant birth date discrepancies espncricinfo wikipedia cricbuzz",
+          "max_results": 5,
+          "include_raw_content": false
+        },
+        "raw_response": {
+          "query": "Rishabh Pant birth date discrepancies espncricinfo wikipedia cricbuzz",
+          "follow_up_questions": null,
+          "answer": null,
+          "images": [],
+          "results": [
+            {
+              "url": "https://hamariweb.com/profiles/rishabh-pant_7290",
+              "title": "Rishabh Pant Age, Wife, Height, Highest Score, Net Worth ...",
+              "content": "Rishabh Pant's date of birth is October 4, 1997. His journey in cricket began at a young age, and he has risen through the ranks to become a vital player for",
+              "score": 0.6501347,
+              "raw_content": null
+            },
+            {
+              "url": "https://simple.wikipedia.org/wiki/Rishabh_Pant",
+              "title": "Rishabh Pant - Simple English Wikipedia, the free encyclopedia",
+              "content": "Full name, Rishabh Rajendra Pant ; Born, (1997-10-04) 4 October 1997 (age 28) Roorkee, Uttarakhand, India ; Batting, Left-handed ; Role, Wicket-keeper batsman.",
+              "score": 0.61279696,
+              "raw_content": null
+            },
+            {
+              "url": "https://www.cricketnmore.com/player-profiles/931581/rishabh-pant",
+              "title": "Cricketer Rishabh Pant Age, Date of Birth, Profile ... - Cricketnmore",
+              "content": "Rishabh Pant was born on October 4, 1997, in Haridwar, Uttarakhand, India. He showed a keen interest in cricket from a young age and began playing the sport in",
+              "score": 0.61279696,
+              "raw_content": null
+            },
+            {
+              "url": "https://cricketarchive.com/Archive/Players/1065/1065017/1065017.html",
+              "title": "Rishabh Pant - CricketArchive",
+              "content": "Full name: Rishabh Rajendra Pant ; Born: 4th October 1997, Haridwar, Uttarakhand, India ; Batting: Left-hand batter ; Bowling: Right-arm medium pace ; Wicket-keeper.",
+              "score": 0.5758033,
+              "raw_content": null
+            },
+            {
+              "url": "https://cricketteambuzz.com/rishabh-pant-profile/",
+              "title": "Rishabh Pant Profile: Age, Test, ODI, T20I, IPL - CRICKET TEAM -",
+              "content": "Full Name, Rishabh Rajendra Pant ; Date of Birth, October 4, 1997 ; Age (as of 2025), 27 Years ; Birthplace, Roorkee, Uttarakhand, India.",
+              "score": 0.5481178,
+              "raw_content": null
+            }
+          ],
+          "response_time": 0.93,
+          "request_id": "d539289c-da5d-4e75-b1ad-272c628ea095"
+        },
+        "simplified_results": [
+          {
+            "title": "Rishabh Pant Age, Wife, Height, Highest Score, Net Worth ...",
+            "content": "Rishabh Pant's date of birth is October 4, 1997. His journey in cricket began at a young age, and he has risen through the ranks to become a vital player for"
+          },
+          {
+            "title": "Rishabh Pant - Simple English Wikipedia, the free encyclopedia",
+            "content": "Full name, Rishabh Rajendra Pant ; Born, (1997-10-04) 4 October 1997 (age 28) Roorkee, Uttarakhand, India ; Batting, Left-handed ; Role, Wicket-keeper batsman."
+          },
+          {
+            "title": "Cricketer Rishabh Pant Age, Date of Birth, Profile ... - Cricketnmore",
+            "content": "Rishabh Pant was born on October 4, 1997, in Haridwar, Uttarakhand, India. He showed a keen interest in cricket from a young age and began playing the sport in"
+          },
+          {
+            "title": "Rishabh Pant - CricketArchive",
+            "content": "Full name: Rishabh Rajendra Pant ; Born: 4th October 1997, Haridwar, Uttarakhand, India ; Batting: Left-hand batter ; Bowling: Right-arm medium pace ; Wicket-keeper."
+          },
+          {
+            "title": "Rishabh Pant Profile: Age, Test, ODI, T20I, IPL - CRICKET TEAM -",
+            "content": "Full Name, Rishabh Rajendra Pant ; Date of Birth, October 4, 1997 ; Age (as of 2025), 27 Years ; Birthplace, Roorkee, Uttarakhand, India."
+          }
+        ]
+      }
+    },
+    {
+      "agent": "research_reporter",
+      "timestamp": "2025-10-29T13:28:30Z",
+      "context": {
+        "system_message": "You are a meticulous research analyst. The current UTC datetime is 2025-10-29T13:27:14Z and today is Wednesday. You will be given the user question and compiled research notes. Synthesize them into a concise, well-structured report that: (1) directly answers the user, (2) highlights 2-3 key takeaways, (3) includes actionable guidance when applicable, and (4) cites every factual statement with `[source name]`. Conclude with the sentence 'Report complete.'",
+        "prompt": "User question:\nage of rishab pant\n\nResearch notes:\nQuery: Rishabh Pant date of birth and place of birth site:espncricinfo.com\n- Rishabh Pant Profile - Cricket Player India | Stats, Records ...: Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper.\n- Cricinfo Statsguru: Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024).\n- Combined Test, ODI and T20I records | Cricinfo Statsguru: Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024).\n- All-round records | Test matches | Cricinfo Statsguru: Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024).\n- All-round records | Twenty20 matches | Cricinfo Statsguru: Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All\n\nQuery: Rishabh Pant age today 2025\n- Rishabh Pant Profile: Age, Stats, Records, ICC Ranking, Career Info ...: Rishabh Pant was born on Oct 04, 1997; and as of 2025, He is 28 years old. Rishabh Pant is a wicket keeper from Haridwar, Uttarakhand and bats left handed. In\n- Rishabh Pant ICC Ranking | Cricket Career, Cricket Info & Stats: Rishabh Pant ; Born, October 4, 1997 ; Current age, 28 Years, 0 Months, 24 Days ; Major team, India, Asia XI, India A, India B, Indian Board Presidents XI, India\n- Check Rishabh Pant IPL 2025 Team, Profile, Stats & Age - League11: Rishabh Pant - Wicketkeeper Batsman Indian - Overview Stats Overview - Born: Oct. 4, 1997 - Height: 5.58 Feet - Batting Style: Left hand Bat - Bowling Style: NA\n- Rishabh Pant - Wikipedia: Personal information ; Full name. Rishabh Rajendra Pant ; Born, (1997-10-04) 4 October 1997 (age 28) Roorkee, Uttar Pradesh (present day Uttarakhand), India.\n- Rishabh Pant Profile - Cricket Player India | Stats, Records, Video: Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper.\n\nQuery: Rishabh Pant debut age Tests ODIs T20Is site:espncricinfo.com\n- Rishabh Pant Profile - Cricket Player India | Stats, Records ...: Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper.\n- All-round records | Under-19s Youth One-Day Internationals: Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All\n- Combined Test, ODI and T20I records | Cricinfo Statsguru: Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All\n- All-round records | Twenty20 matches | Cricinfo Statsguru: Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All\n- Rishabh Pant Debut and last played matches in Tests ...: Rishabh Pant ; Test Matches. View Test Records · England vs India at Nottingham- August 18 - 22, 2018 · England vs India at Manchester- July 23 - 27, 2025 ; ODI\n\nQuery: Rishabh Pant birth date discrepancies espncricinfo wikipedia cricbuzz\n- Rishabh Pant Age, Wife, Height, Highest Score, Net Worth ...: Rishabh Pant's date of birth is October 4, 1997. His journey in cricket began at a young age, and he has risen through the ranks to become a vital player for\n- Rishabh Pant - Simple English Wikipedia, the free encyclopedia: Full name, Rishabh Rajendra Pant ; Born, (1997-10-04) 4 October 1997 (age 28) Roorkee, Uttarakhand, India ; Batting, Left-handed ; Role, Wicket-keeper batsman.\n- Cricketer Rishabh Pant Age, Date of Birth, Profile ... - Cricketnmore: Rishabh Pant was born on October 4, 1997, in Haridwar, Uttarakhand, India. He showed a keen interest in cricket from a young age and began playing the sport in\n- Rishabh Pant - CricketArchive: Full name: Rishabh Rajendra Pant ; Born: 4th October 1997, Haridwar, Uttarakhand, India ; Batting: Left-hand batter ; Bowling: Right-arm medium pace ; Wicket-keeper.\n- Rishabh Pant Profile: Age, Test, ODI, T20I, IPL - CRICKET TEAM -: Full Name, Rishabh Rajendra Pant ; Date of Birth, October 4, 1997 ; Age (as of 2025), 27 Years ; Birthplace, Roorkee, Uttarakhand, India.\n\nFollow the system instructions to produce the final report.",
+        "raw_output": "Direct answer:\n- Rishabh Pant was born on 4 October 1997. [ESPNcricinfo]\n- As of today, 29 October 2025, his age is 28 years and 25 days (28y 25d). [ESPNcricinfo]\n\nKey takeaways:\n- Date of birth: 4 October 1997. [ESPNcricinfo]\n- Current age: 28y 25d as of 29 October 2025. [ESPNcricinfo]\n- Birthplace discrepancy across sources: ESPNcricinfo lists Haridwar, Uttarakhand, whereas some sources (e.g., Wikipedia) list Roorkee, Uttarakhand. [ESPNcricinfo], [Wikipedia]\n\nActionable guidance:\n- To cite his age accurately in a document, use ESPNcricinfo as the canonical source for birth date and current age. If birthplace is needed, cross-check multiple sources and note the discrepancy. [ESPNcricinfo], [Wikipedia]\n\nReport complete.",
+        "final_output": "Direct answer:\n- Rishabh Pant was born on 4 October 1997. [ESPNcricinfo]\n- As of today, 29 October 2025, his age is 28 years and 25 days (28y 25d). [ESPNcricinfo]\n\nKey takeaways:\n- Date of birth: 4 October 1997. [ESPNcricinfo]\n- Current age: 28y 25d as of 29 October 2025. [ESPNcricinfo]\n- Birthplace discrepancy across sources: ESPNcricinfo lists Haridwar, Uttarakhand, whereas some sources (e.g., Wikipedia) list Roorkee, Uttarakhand. [ESPNcricinfo], [Wikipedia]\n\nActionable guidance:\n- To cite his age accurately in a document, use ESPNcricinfo as the canonical source for birth date and current age. If birthplace is needed, cross-check multiple sources and note the discrepancy. [ESPNcricinfo], [Wikipedia]\n\n"
+      }
+    }
+  ],
+  "final_response": "Direct answer:\n- Rishabh Pant was born on 4 October 1997. [ESPNcricinfo]\n- As of today, 29 October 2025, his age is 28 years and 25 days (28y 25d). [ESPNcricinfo]\n\nKey takeaways:\n- Date of birth: 4 October 1997. [ESPNcricinfo]\n- Current age: 28y 25d as of 29 October 2025. [ESPNcricinfo]\n- Birthplace discrepancy across sources: ESPNcricinfo lists Haridwar, Uttarakhand, whereas some sources (e.g., Wikipedia) list Roorkee, Uttarakhand. [ESPNcricinfo], [Wikipedia]\n\nActionable guidance:\n- To cite his age accurately in a document, use ESPNcricinfo as the canonical source for birth date and current age. If birthplace is needed, cross-check multiple sources and note the discrepancy. [ESPNcricinfo], [Wikipedia]\n\n",
+  "research_questions": [
+    "What is Rishabh Pant's date of birth and place of birth?",
+    "How old is Rishabh Pant as of today?",
+    "At what ages did Pant debut in Tests, ODIs, and T20Is, and what major milestones did he achieve at those ages?",
+    "How does Pant's age compare with other Indian cricketers in similar roles or generations at comparable career stages?",
+    "What sources reliably provide Pant's birth date and current age, and are there any discrepancies among major databases?"
+  ],
+  "action_history": [],
+  "evidence_summary": [
+    {
+      "query": "Rishabh Pant date of birth and place of birth site:espncricinfo.com",
+      "results": [
+        {
+          "title": "Rishabh Pant Profile - Cricket Player India | Stats, Records ...",
+          "content": "Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper."
+        },
+        {
+          "title": "Cricinfo Statsguru",
+          "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024)."
+        },
+        {
+          "title": "Combined Test, ODI and T20I records | Cricinfo Statsguru",
+          "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024)."
+        },
+        {
+          "title": "All-round records | Test matches | Cricinfo Statsguru",
+          "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024)."
+        },
+        {
+          "title": "All-round records | Twenty20 matches | Cricinfo Statsguru",
+          "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All"
+        }
+      ]
+    },
+    {
+      "query": "Rishabh Pant age today 2025",
+      "results": [
+        {
+          "title": "Rishabh Pant Profile: Age, Stats, Records, ICC Ranking, Career Info ...",
+          "content": "Rishabh Pant was born on Oct 04, 1997; and as of 2025, He is 28 years old. Rishabh Pant is a wicket keeper from Haridwar, Uttarakhand and bats left handed. In"
+        },
+        {
+          "title": "Rishabh Pant ICC Ranking | Cricket Career, Cricket Info & Stats",
+          "content": "Rishabh Pant ; Born, October 4, 1997 ; Current age, 28 Years, 0 Months, 24 Days ; Major team, India, Asia XI, India A, India B, Indian Board Presidents XI, India"
+        },
+        {
+          "title": "Check Rishabh Pant IPL 2025 Team, Profile, Stats & Age - League11",
+          "content": "Rishabh Pant - Wicketkeeper Batsman Indian - Overview Stats Overview - Born: Oct. 4, 1997 - Height: 5.58 Feet - Batting Style: Left hand Bat - Bowling Style: NA"
+        },
+        {
+          "title": "Rishabh Pant - Wikipedia",
+          "content": "Personal information ; Full name. Rishabh Rajendra Pant ; Born, (1997-10-04) 4 October 1997 (age 28) Roorkee, Uttar Pradesh (present day Uttarakhand), India."
+        },
+        {
+          "title": "Rishabh Pant Profile - Cricket Player India | Stats, Records, Video",
+          "content": "Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper."
+        }
+      ]
+    },
+    {
+      "query": "Rishabh Pant debut age Tests ODIs T20Is site:espncricinfo.com",
+      "results": [
+        {
+          "title": "Rishabh Pant Profile - Cricket Player India | Stats, Records ...",
+          "content": "Full Name. Rishabh Rajendra Pant ; Born. October 04, 1997, Haridwar, Uttarakhand ; Age. 28y 25d ; Batting Style. Left hand Bat ; Fielding Position. Wicketkeeper."
+        },
+        {
+          "title": "All-round records | Under-19s Youth One-Day Internationals",
+          "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All"
+        },
+        {
+          "title": "Combined Test, ODI and T20I records | Cricinfo Statsguru",
+          "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All"
+        },
+        {
+          "title": "All-round records | Twenty20 matches | Cricinfo Statsguru",
+          "content": "Rishabh Pant - left-hand bat; wicketkeeper - Player profile. Born October 4, 1997. Tests (2018 - 2025) · ODIs (2018/19 - 2024) · T20Is (2016/17 - 2024). All"
+        },
+        {
+          "title": "Rishabh Pant Debut and last played matches in Tests ...",
+          "content": "Rishabh Pant ; Test Matches. View Test Records · England vs India at Nottingham- August 18 - 22, 2018 · England vs India at Manchester- July 23 - 27, 2025 ; ODI"
+        }
+      ]
+    },
+    {
+      "query": "Rishabh Pant birth date discrepancies espncricinfo wikipedia cricbuzz",
+      "results": [
+        {
+          "title": "Rishabh Pant Age, Wife, Height, Highest Score, Net Worth ...",
+          "content": "Rishabh Pant's date of birth is October 4, 1997. His journey in cricket began at a young age, and he has risen through the ranks to become a vital player for"
+        },
+        {
+          "title": "Rishabh Pant - Simple English Wikipedia, the free encyclopedia",
+          "content": "Full name, Rishabh Rajendra Pant ; Born, (1997-10-04) 4 October 1997 (age 28) Roorkee, Uttarakhand, India ; Batting, Left-handed ; Role, Wicket-keeper batsman."
+        },
+        {
+          "title": "Cricketer Rishabh Pant Age, Date of Birth, Profile ... - Cricketnmore",
+          "content": "Rishabh Pant was born on October 4, 1997, in Haridwar, Uttarakhand, India. He showed a keen interest in cricket from a young age and began playing the sport in"
+        },
+        {
+          "title": "Rishabh Pant - CricketArchive",
+          "content": "Full name: Rishabh Rajendra Pant ; Born: 4th October 1997, Haridwar, Uttarakhand, India ; Batting: Left-hand batter ; Bowling: Right-arm medium pace ; Wicket-keeper."
+        },
+        {
+          "title": "Rishabh Pant Profile: Age, Test, ODI, T20I, IPL - CRICKET TEAM -",
+          "content": "Full Name, Rishabh Rajendra Pant ; Date of Birth, October 4, 1997 ; Age (as of 2025), 27 Years ; Birthplace, Roorkee, Uttarakhand, India."
+        }
+      ]
+    }
+  ]
+}

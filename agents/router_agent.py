@@ -62,8 +62,7 @@ class RouterAgent:
             "You are a travel planning router. "
             "Use the specialized tools (`hotels.search`, `flights.search`, `places.search`, `web.search`) "
             "to gather structured information, then synthesize a helpful answer. "
-            "Finish by summarizing the recommendations prefixed with 'FINAL ANSWER:' "
-            "and avoid continuing the conversation afterwards."
+            "Finish with a concise summary of the recommendations and avoid continuing the conversation afterwards."
         )
 
         tools = [
@@ -134,8 +133,6 @@ class RouterAgent:
         result = await self._assistant.run(task=query)
         final_message = self._last_chat_message(result.messages)
         content = final_message.to_text().strip()
-        if content.startswith("FINAL ANSWER:"):
-            return content.split("FINAL ANSWER:", 1)[1].strip()
         return content
 
     def _run_async(self, coro: asyncio.Future[str] | asyncio.coroutines.Coroutine[Any, Any, str]) -> str:

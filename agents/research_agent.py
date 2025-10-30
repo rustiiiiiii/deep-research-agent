@@ -18,9 +18,12 @@ import json
 import logging
 import os
 import re
+from collections import deque
+from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Sequence
+from typing import Any, Deque, Dict, Iterable, List, Optional, Sequence
+from uuid import uuid4
 
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.conditions import TextMentionTermination
@@ -29,9 +32,19 @@ from autogen_agentchat.teams import SelectorGroupChat
 from autogen_core.models import ChatCompletionClient, ModelInfo
 from autogen_core.tools import FunctionTool
 from autogen_ext.models.openai import OpenAIChatCompletionClient
+from research_state_manager import ResearchQuestionState
 from pydantic import ValidationError
 
 from .mcp_client import MCPServerConfig, MCPToolClient
+from .research_prompts import (
+    EVALUATOR_PROMPT,
+    PLANNER_PROMPT,
+    QUESTION_BREAKDOWN_PROMPT,
+    SEARCH_QUERY_PROMPT,
+    report_prompt,
+    writer_prompt,
+)
+from research_state_manager import ResearchQuestionState
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +78,7 @@ class ResearchAgent:
         self._verbose = verbose
         self._max_tool_iterations = max(1, max_tool_iterations)
         self._group_chat_max_turns = max(2, group_chat_max_turns)
+        self._termination_phrase = "Report complete."
 
         tavily_options = {
             "max_results": tavily_max_results,
@@ -73,6 +87,7 @@ class ResearchAgent:
         if tavily_kwargs:
             tavily_options.update(tavily_kwargs)
         self._tavily_options = tavily_options
+        self._tavily_tool_name = tavily_mcp_tool_name
         self._tavily_tool = MCPToolClient(
             config=MCPServerConfig(
                 base_url=tavily_mcp_base_url,
@@ -98,77 +113,63 @@ class ResearchAgent:
             ),
         )
 
+        self._question_system_message = QUESTION_BREAKDOWN_PROMPT
         self._question_agent = AssistantAgent(
             name="question_breakdown",
             model_client=self._model_client,
-            system_message=(
-                "You analyze the user's research request and break it into 4-5 concise, targeted sub-questions. "
-                "Each sub-question should be specific enough to research independently while collectively addressing the original request. "
-                "Respond ONLY with a JSON array of strings."
-            ),
+            system_message=self._question_system_message,
             description="Decomposes the primary request into focused research questions.",
             tools=[],
             max_tool_iterations=1,
         )
 
+        self._search_system_message = SEARCH_QUERY_PROMPT
         self._search_agent = AssistantAgent(
             name="search_query_generator",
             model_client=self._model_client,
-            system_message=(
-                "You craft focused web search queries. Given a user question, list 3-4 short, precise search queries that "
-                "will retrieve trustworthy, fresh information. Respond ONLY with a JSON array of strings."
-            ),
+            system_message=self._search_system_message,
             description="Generates targeted search queries with no tool usage.",
             tools=[],
             max_tool_iterations=1,
         )
 
-        system_message = (
-            f"You are a meticulous research analyst. The current UTC datetime is {current_dt_iso} and today is {current_day}. "
-            "You will be given the user question and compiled research notes. Synthesize them into a concise, well-structured report "
-            "that: (1) directly answers the user, (2) highlights 2-3 key takeaways, (3) includes actionable guidance when applicable, "
-            "and (4) cites every factual statement with `[source name]`. Close with the prefix 'FINAL ANSWER:' and nothing after it."
-        )
-
+        self._report_system_message = report_prompt(current_dt_iso=current_dt_iso, current_day=current_day)
         logger.info("Initializing report agent with OpenAI model '%s'", openai_model_name)
         self._report_agent = AssistantAgent(
             name="research_reporter",
             model_client=self._model_client,
-            system_message=system_message,
+            system_message=self._report_system_message,
             description="Synthesizes gathered evidence into a final report.",
             tools=[],
             max_tool_iterations=1,
         )
 
-        planner_system_message = (
-            "You are a research planner collaborating with the `research_writer` in a Microsoft AutoGen group chat. "
-            "Always acknowledge the history of actions already taken before deciding what to do next. "
-            "When a user question arrives, break it into concrete search tasks by proposing a JSON array of concise, "
-            "targeted queries. Do not call any tools yourself—the host application will execute the searches. "
-            "Once you have listed the necessary queries, send a summary message that begins with 'HANDOFF TO WRITER:' "
-            "and outline how the collected results should be synthesized. Never write the user's final answer yourself."
-        )
+        self._planner_system_message = PLANNER_PROMPT
         self._planner_agent = AssistantAgent(
             name="research_planner",
             model_client=self._model_client,
-            system_message=planner_system_message,
+            system_message=self._planner_system_message,
             description="Plans searches by emitting query suggestions only.",
             tools=[],
             max_tool_iterations=1,
         )
 
-        writer_system_message = (
-            f"You are a research writer collaborating with `research_planner`. The current UTC datetime is {current_dt_iso} and today is {current_day}. "
-            "Review the entire conversation history, including the planner's notes and tool outputs. Wait until the planner "
-            "sends a message starting with 'HANDOFF TO WRITER:' before you reply. Craft a concise, well-structured report that "
-            "(1) directly answers the user, (2) highlights 2-3 key takeaways, (3) includes actionable guidance when applicable, "
-            "and (4) cites every factual statement with `[source name]`. Close with the prefix 'FINAL ANSWER:' and nothing after it."
-        )
+        self._writer_system_message = writer_prompt(current_dt_iso=current_dt_iso, current_day=current_day)
         self._writer_agent = AssistantAgent(
             name="research_writer",
             model_client=self._model_client,
-            system_message=writer_system_message,
+            system_message=self._writer_system_message,
             description="Writes the final response after the planner hands off.",
+            tools=[],
+            max_tool_iterations=1,
+        )
+
+        self._evaluator_system_message = EVALUATOR_PROMPT
+        self._evaluator_agent = AssistantAgent(
+            name="research_evaluator",
+            model_client=self._model_client,
+            system_message=self._evaluator_system_message,
+            description="Evaluates retrieved evidence before synthesis.",
             tools=[],
             max_tool_iterations=1,
         )
@@ -176,30 +177,87 @@ class ResearchAgent:
         self._last_group_transcript: List[Dict[str, Any]] = []
         self._action_history: List[Dict[str, Any]] = []
         self._last_research_questions: List[str] = []
+        self._research_states: List[ResearchQuestionState] = []
+        self._latest_evidence: List[Dict[str, Any]] = []
+        self._pending_queries: Deque[str] = deque()
+        self._current_query: Optional[str] = None
+        self._log_dir = Path("logs")
+        self._current_log: Optional[Dict[str, Any]] = None
+        self._current_log_path: Optional[Path] = None
 
     def run(self, question: str) -> str:
         """Back-compat: delegate to .invoke()."""
         return self.invoke(question)
 
+
+    def process_single_research_question(self, research_question: ResearchQuestionState) -> None:
+        """Placeholder for single research question processing hook."""
+        _ = research_question
+
     def invoke(self, question: str) -> str:
         if not question or not question.strip():
             raise ValueError("Question must be a non-empty string.")
 
-        logger.info("Received query: %s", question)
-        self._last_research_questions = self._generate_research_questions(question)
+        original_question = question
+        self._start_interaction_log(original_question)
+        logger.info("Received query: %s", original_question)
+
+        # generate the research questions for the user's question
+        self._last_research_questions = self._generate_research_questions(original_question)
+
         logger.info("Breakdown agent produced %d research questions.", len(self._last_research_questions))
+
+        # create a state object for every research question
+        self._research_states = []
+        for idx, research_question in enumerate(self._last_research_questions):
+            state = ResearchQuestionState(research_question=research_question)
+            self._research_states.append(state)
+            self._log_agent_context(
+                "research_question_state",
+                {
+                    "index": idx,
+                    "state": self._make_serializable(asdict(state)),
+                },
+            )
+
+            # process this research task 
+            self.process_single_research_question(state)
+            
+
         self._last_group_transcript = []
         self._action_history = []
-        queries = self._generate_search_queries(question)
+        self._latest_evidence = []
+        queries = self._generate_search_queries(original_question)
         logger.info("Search agent produced %d queries; executing searches host-side.", len(queries))
-        evidence = self._collect_evidence(queries)
-        answer = self._generate_report(question, evidence)
+        self._pending_queries = deque(queries)
+        self._log_agent_context(
+            "query_queue",
+            {
+                "pending": list(self._pending_queries),
+            },
+        )
+        if not self._pending_queries:
+            raise RuntimeError("No research queries were generated for this question.")
+        current_query = self._pending_queries.popleft()
+        self._current_query = current_query
+        self._log_agent_context(
+            "query_dispatch",
+            {
+                "selected_query": current_query,
+                "remaining": list(self._pending_queries),
+            },
+        )
+        evidence = self._collect_single_query_evidence(current_query)
+        answer: Optional[str] = None
         try:
+            answer = self._generate_report(original_question, evidence)
             logger.info("Query processed successfully.")
-            self._persist_response(question=question, response=answer)
+            self._persist_response(question=original_question, response=answer)
+            self._finalize_interaction_log(final_response=answer)
             return answer
-        except Exception:
+        except Exception as exc:
             logger.exception("Error while invoking the research agent.")
+            self._finalize_interaction_log(final_response=answer, error=str(exc))
             raise
 
     # ------------------------------------------------------------------
@@ -224,6 +282,17 @@ class ResearchAgent:
                 transcript.append({"type": type(message).__name__, "repr": repr(message)})
         self._last_group_transcript = transcript
         final_text = self._extract_text(result.messages, preferred_source=self._writer_agent.name)
+        self._log_agent_context(
+            "group_chat",
+            {
+                "task": question,
+                "participants": [self._planner_agent.name, self._writer_agent.name],
+                "planner_system_message": self._planner_system_message,
+                "writer_system_message": self._writer_system_message,
+                "termination_phrase": self._termination_phrase,
+                "transcript": transcript,
+            },
+        )
         return final_text
 
     def _create_group_chat(self) -> SelectorGroupChat:
@@ -231,7 +300,7 @@ class ResearchAgent:
 
         self._reset_agent(self._planner_agent)
         self._reset_agent(self._writer_agent)
-        termination = TextMentionTermination("FINAL ANSWER:")
+        termination = TextMentionTermination(self._termination_phrase)
         team = SelectorGroupChat(
             participants=[self._planner_agent, self._writer_agent],
             model_client=self._model_client,
@@ -260,7 +329,7 @@ class ResearchAgent:
             return self._planner_agent.name
         if source == self._writer_agent.name:
             content = last_message.to_text()
-            if "FINAL ANSWER:" in content:
+            if content.strip().lower().endswith(self._termination_phrase.lower()):
                 return self._writer_agent.name
             return self._planner_agent.name
         return self._planner_agent.name
@@ -281,6 +350,15 @@ class ResearchAgent:
         if len(questions) < 1 and question.strip():
             questions = [question.strip()]
         logger.info("Using research questions: %s", questions)
+        self._log_agent_context(
+            self._question_agent.name,
+            {
+                "system_message": self._question_system_message,
+                "prompt": prompt,
+                "raw_output": text,
+                "parsed_questions": questions,
+            },
+        )
         return questions
 
     def _generate_search_queries(self, question: str) -> List[str]:
@@ -301,34 +379,51 @@ class ResearchAgent:
         if not queries:
             queries = [question.strip()]
         logger.info("Using search queries: %s", queries)
+        self._log_agent_context(
+            self._search_agent.name,
+            {
+                "system_message": self._search_system_message,
+                "prompt": prompt,
+                "raw_output": text,
+                "parsed_queries": queries,
+            },
+        )
         return queries
 
-    def _collect_evidence(self, queries: List[str]) -> List[Dict[str, Any]]:
-        evidence: List[Dict[str, Any]] = []
-        for query in queries:
-            logger.info("Executing Tavily search for: %s", query)
-            payload = {"query": query, **self._tavily_options}
-            response = self._tavily_tool.call_tool(**payload)
-            simplified = []
-            entries = []
-            if isinstance(response, dict):
-                entries = response.get("results") or response.get("data") or []
-                if not isinstance(entries, list):
-                    entries = [response]
-            elif isinstance(response, list):
-                entries = response
-            else:
+    def _collect_single_query_evidence(self, query: str) -> List[Dict[str, Any]]:
+        logger.info("Executing Tavily search for: %s", query)
+        payload = {"query": query, **self._tavily_options}
+        response = self._tavily_tool.call_tool(**payload)
+        simplified = []
+        entries = []
+        if isinstance(response, dict):
+            entries = response.get("results") or response.get("data") or []
+            if not isinstance(entries, list):
                 entries = [response]
+        elif isinstance(response, list):
+            entries = response
+        else:
+            entries = [response]
 
-            for entry in entries:
-                if not isinstance(entry, dict):
-                    simplified.append({"title": str(entry), "content": str(entry)})
-                    continue
-                title = entry.get("title") or entry.get("source") or entry.get("url") or "Result"
-                content = entry.get("content") or entry.get("snippet") or entry.get("summary") or ""
-                simplified.append({"title": title, "content": content})
+        for entry in entries:
+            if not isinstance(entry, dict):
+                simplified.append({"title": str(entry), "content": str(entry)})
+                continue
+            title = entry.get("title") or entry.get("source") or entry.get("url") or "Result"
+            content = entry.get("content") or entry.get("snippet") or entry.get("summary") or ""
+            simplified.append({"title": title, "content": content})
 
-            evidence.append({"query": query, "results": simplified})
+        evidence = [{"query": query, "results": simplified}]
+        self._log_agent_context(
+            self._tavily_tool_name,
+            {
+                "query": query,
+                "payload": self._make_serializable(payload),
+                "raw_response": self._make_serializable(response),
+                "simplified_results": simplified,
+            },
+        )
+        self._latest_evidence = evidence
         return evidence
 
     def _generate_report(self, question: str, evidence: List[Dict[str, Any]]) -> str:
@@ -341,9 +436,19 @@ class ResearchAgent:
         result = self._run_async(self._report_agent.run(task=prompt))
         text = self._extract_text(result.messages, preferred_source=self._report_agent.name)
         logger.info("Final response: %s", text)
-        if text.startswith("FINAL ANSWER:"):
-            return text.split("FINAL ANSWER:", 1)[1].strip()
-        return text
+        cleaned = text.strip()
+        if cleaned.lower().endswith(self._termination_phrase.lower()):
+            cleaned = cleaned[: -(len(self._termination_phrase))].rstrip(" .")
+        self._log_agent_context(
+            self._report_agent.name,
+            {
+                "system_message": self._report_system_message,
+                "prompt": prompt,
+                "raw_output": text,
+                "final_output": cleaned,
+            },
+        )
+        return cleaned
 
 
     def _persist_response(self, *, question: str, response: str) -> None:
@@ -396,6 +501,15 @@ class ResearchAgent:
         if not lines:
             lines.append("No results found.")
         summary_text = "Search results for '{query}':\n" + "\n".join(lines)
+        self._log_agent_context(
+            f"{self._tavily_tool_name} (group)",
+            {
+                "query": query,
+                "payload": self._make_serializable(payload),
+                "raw_response": self._make_serializable(raw),
+                "summarised_results": simplified,
+            },
+        )
         return summary_text.format(query=query)
 
     def _run_async(self, coro: asyncio.Future[str] | asyncio.coroutines.Coroutine[Any, Any, str]) -> Any:
@@ -423,17 +537,26 @@ class ResearchAgent:
 
     def _extract_text(self, messages: Iterable[Any], preferred_source: Optional[str]) -> str:
         final_message = self._last_chat_message(messages, preferred_source=preferred_source)
-@@ -236,50 +394,62 @@ class ResearchAgent:
+        to_text = getattr(final_message, "to_text", None)
+        if callable(to_text):
+            return to_text().strip()
+        return str(final_message).strip()
+
+    def _parse_queries(self, text: str) -> List[str]:
+        try:
             data = json.loads(text)
             if isinstance(data, list):
                 return [str(item).strip() for item in data if str(item).strip()]
         except json.JSONDecodeError:
-            logger.debug("Failed to parse JSON queries; falling back to plain text.")
+            logger.debug("Failed to parse JSON array; falling back to plaintext parsing.")
+
         queries: List[str] = []
         for line in text.splitlines():
-            line = line.strip().lstrip("-•1234567890. ").strip()
-            if line:
-                queries.append(line)
+            cleaned = line.strip().lstrip("-•1234567890. ").strip()
+            if cleaned:
+                queries.append(cleaned)
+        if not queries and text.strip():
+            queries.append(text.strip())
         return queries
 
     def _format_evidence(self, evidence: List[Dict[str, Any]]) -> str:
@@ -467,6 +590,18 @@ class ResearchAgent:
 
         return list(self._last_research_questions)
 
+    @property
+    def research_states(self) -> List[ResearchQuestionState]:
+        """Return dataclass snapshots for the generated research questions."""
+
+        return list(self._research_states)
+
+    @property
+    def pending_queries(self) -> List[str]:
+        """Return the queue of assistant-generated queries awaiting processing."""
+
+        return list(self._pending_queries)
+
     def _reset_agent(self, agent: AssistantAgent) -> None:
         reset = getattr(agent, "reset", None)
         if callable(reset):
@@ -492,3 +627,72 @@ class ResearchAgent:
             "include_name_in_message": False,
             "model_info": model_info,
         }
+        if temperature is not None:
+            client_kwargs["temperature"] = temperature
+        return OpenAIChatCompletionClient(**client_kwargs)
+
+    # ------------------------------------------------------------------
+    # Logging helpers
+    # ------------------------------------------------------------------
+    def _start_interaction_log(self, question: str) -> None:
+        try:
+            self._log_dir.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:  # pragma: no cover - filesystem issues
+            logger.warning("Unable to create log directory %s: %s", self._log_dir, exc)
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        file_name = f"research_agent_{timestamp}_{uuid4().hex[:8]}.json"
+        self._current_log_path = self._log_dir / file_name
+        self._current_log = {
+            "timestamp": timestamp,
+            "question": question,
+            "steps": [],
+        }
+
+    def _log_agent_context(self, agent_name: str, context: Dict[str, Any]) -> None:
+        if not self._current_log:
+            return
+        entry = {
+            "agent": agent_name,
+            "timestamp": datetime.utcnow().isoformat(timespec="seconds") + "Z",
+            "context": self._make_serializable(context),
+        }
+        self._current_log.setdefault("steps", []).append(entry)
+
+    def _finalize_interaction_log(self, *, final_response: Optional[str], error: Optional[str] = None) -> None:
+        if not self._current_log or not self._current_log_path:
+            return
+        if final_response is not None:
+            self._current_log["final_response"] = final_response
+        if error:
+            self._current_log["error"] = error
+        self._current_log["research_questions"] = self._last_research_questions
+        self._current_log["research_states"] = self._make_serializable(
+            [asdict(state) for state in self._research_states]
+        )
+        self._current_log["processed_query"] = self._current_query
+        self._current_log["remaining_queries"] = list(self._pending_queries)
+        self._current_log["action_history"] = self._make_serializable(self._action_history)
+        self._current_log["evidence_summary"] = self._make_serializable(self._latest_evidence)
+        try:
+            serialized = json.dumps(self._current_log, indent=2, ensure_ascii=False)
+            self._current_log_path.write_text(serialized, encoding="utf-8")
+            logger.info("Wrote interaction log to %s", self._current_log_path)
+        except OSError as exc:  # pragma: no cover - filesystem issues
+            logger.warning("Failed to write interaction log %s: %s", self._current_log_path, exc)
+        finally:
+            self._current_log = None
+            self._current_log_path = None
+            self._current_query = None
+
+    def _make_serializable(self, data: Any) -> Any:
+        try:
+            json.dumps(data)
+            return data
+        except TypeError:
+            if isinstance(data, dict):
+                return {str(key): self._make_serializable(value) for key, value in data.items()}
+            if isinstance(data, list):
+                return [self._make_serializable(item) for item in data]
+            if isinstance(data, (set, tuple)):
+                return [self._make_serializable(item) for item in data]
+            return repr(data)
